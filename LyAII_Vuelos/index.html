@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Buscador de rutas de vuelos con BFS">
+    <title>Vuelos BFS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Vuelos BFS</h1>
+
+        <!-- Ubicación actual -->
+        <div class="card" id="locationCard" style="display:none;">
+            <span class="label">Ubicación actual</span>
+            <span class="city" id="currentCity"></span>
+        </div>
+
+        <!-- Formulario -->
+        <div class="card">
+            <label for="citySelect" id="selectLabel">Selecciona tu origen</label>
+            <select id="citySelect">
+                <option value="">— Elige una ciudad —</option>
+            </select>
+            <button id="actionBtn" disabled>Establecer origen</button>
+        </div>
+
+        <!-- Resultado de ruta -->
+        <div class="card" id="routeCard" style="display:none;">
+            <span class="label">Ruta encontrada</span>
+            <div class="route" id="routePath"></div>
+        </div>
+
+        <!-- Historial -->
+        <div id="historyCard" style="display:none;">
+            <span class="label">Historial</span>
+            <ul class="history" id="historyList"></ul>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

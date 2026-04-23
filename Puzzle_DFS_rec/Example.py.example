@@ -1,0 +1,127 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, validator
+from typing import List
+from arbol import Nodo
+
+app = FastAPI(
+    title="Puzzle DFS",
+    description="API para resolver un puzzle lineal de 4 elementos usando búsqueda en profundidad (DFS)",
+    version="1.0.0"
+)
+
+
+class PuzzleRequest(BaseModel):
+    estado_inicial: List[int]
+    solucion: List[int]
+
+    @validator("estado_inicial", "solucion")
+    def validate_state(cls, v):
+        if len(v) != 4:
+            raise ValueError("El estado debe tener exactamente 4 elementos")
+        if sorted(v) != [1, 2, 3, 4]:
+            raise ValueError("El estado debe contener los números 1, 2, 3 y 4 sin repetir")
+        return v
+
+
+class PuzzleResponse(BaseModel):
+    solucionado: bool
+    pasos: List[List[int]]
+    total_pasos: int
+    mensaje: str
+
+
+def buscar_solucion_DFS(estado_inicial, solucion, max_iteraciones=100000):
+    """DFS con límite de iteraciones para evitar loops infinitos."""
+    solucionado = False
+    nodos_visitados = []
+    nodos_frontera = []
+    nodo_inicial = Nodo(estado_inicial)
+    nodos_frontera.append(nodo_inicial)
+    iteraciones = 0
+
+    while not solucionado and len(nodos_frontera) != 0:
+        iteraciones += 1
+        if iteraciones > max_iteraciones:
+            return None
+
+        nodo = nodos_frontera.pop()
+        nodos_visitados.append(nodo)
+
+        if nodo.get_datos() == solucion:
+            solucionado = True
+            return nodo
+        else:
+            dato_nodo = nodo.get_datos()
+
+            # Operador izquierdo
+            hijo = [dato_nodo[1], dato_nodo[0], dato_nodo[2], dato_nodo[3]]
+            hijo_izq = Nodo(hijo)
+            hijo_izq.padre = nodo
+            if not hijo_izq.en_lista(nodos_visitados) \
+                    and not hijo_izq.en_lista(nodos_frontera):
+                nodos_frontera.append(hijo_izq)
+
+            # Operador medio
+            hijo = [dato_nodo[0], dato_nodo[2], dato_nodo[1], dato_nodo[3]]
+            hijo_medio = Nodo(hijo)
+            hijo_medio.padre = nodo
+            if not hijo_medio.en_lista(nodos_visitados) \
+                    and not hijo_medio.en_lista(nodos_frontera):
+                nodos_frontera.append(hijo_medio)
+
+            # Operador derecho
+            hijo = [dato_nodo[0], dato_nodo[1], dato_nodo[3], dato_nodo[2]]
+            hijo_der = Nodo(hijo)
+            hijo_der.padre = nodo
+            if not hijo_der.en_lista(nodos_visitados) \
+                    and not hijo_der.en_lista(nodos_frontera):
+                nodos_frontera.append(hijo_der)
+
+    return None
+
+
+@app.post("/api/resolver", response_model=PuzzleResponse)
+def resolver_puzzle(request: PuzzleRequest):
+    """Resuelve el puzzle lineal usando DFS."""
+    if request.estado_inicial == request.solucion:
+        return PuzzleResponse(
+            solucionado=True,
+            pasos=[request.estado_inicial],
+            total_pasos=0,
+            mensaje="El estado inicial ya es la solución"
+        )
+
+    nodo_solucion = buscar_solucion_DFS(request.estado_inicial, request.solucion)
+
+    if nodo_solucion is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontró solución dentro del límite de iteraciones"
+        )
+
+    # Reconstruir el camino
+    resultado = []
+    nodo = nodo_solucion
+    while nodo.get_padre() is not None:
+        resultado.append(nodo.get_datos())
+        nodo = nodo.get_padre()
+    resultado.append(request.estado_inicial)
+    resultado.reverse()
+
+    return PuzzleResponse(
+        solucionado=True,
+        pasos=resultado,
+        total_pasos=len(resultado) - 1,
+        mensaje=f"Solución encontrada en {len(resultado) - 1} pasos"
+    )
+
+
+# Servir frontend
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/")
+def serve_frontend():
+    return FileResponse("static/index.html")

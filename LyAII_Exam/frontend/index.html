@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS Puzzle Solver</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <main class="container">
+        <header>
+            <h1>Rutas <span class="accent">BFS</span></h1>
+            <p>Búsqueda de la ruta más corta entre ciudades usando BFS.</p>
+        </header>
+
+        <div class="layout-grid">
+            <div class="left-panel">
+                <section class="card">
+                    <div class="input-group">
+                        <label>Ciudad Origen</label>
+                        <select id="initial-state" class="single-input" required>
+                            <option value="CDMX">CDMX</option>
+                            <option value="HIDALGO">HIDALGO</option>
+                            <option value="MORELOS">MORELOS</option>
+                            <option value="JILOTEPEC">JILOTEPEC</option>
+                            <option value="MONTERREY">MONTERREY</option>
+                            <option value="TAMAULIPAS">TAMAULIPAS</option>
+                            <option value="QRO">QRO</option>
+                            <option value="GUADALAJARA">GUADALAJARA</option>
+                            <option value="SLP">SLP</option>
+                            <option value="ZACATECAS">ZACATECAS</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Ciudad Destino</label>
+                        <select id="goal-state" class="single-input" required>
+                            <option value="ZACATECAS">ZACATECAS</option>
+                            <option value="CDMX">CDMX</option>
+                            <option value="HIDALGO">HIDALGO</option>
+                            <option value="MORELOS">MORELOS</option>
+                            <option value="JILOTEPEC">JILOTEPEC</option>
+                            <option value="MONTERREY">MONTERREY</option>
+                            <option value="TAMAULIPAS">TAMAULIPAS</option>
+                            <option value="QRO">QRO</option>
+                            <option value="GUADALAJARA">GUADALAJARA</option>
+                            <option value="SLP">SLP</option>
+                        </select>
+                    </div>
+
+                    <button id="solve-btn">
+                        <span>Resolver con BFS</span>
+                        <div class="loader" id="loader" style="display: none;"></div>
+                    </button>
+                    <div class="error-msg" id="error-msg"></div>
+                </section>
+            </div>
+
+            <div class="right-panel">
+                <section class="results-container" id="results-container" style="display: none;">
+                    <h2>Solución Encontrada en <span class="accent" id="steps-count">0</span> pasos</h2>
+                    <div class="path" id="path-visualizer">
+                        <!-- Pasos generados por JS -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>
